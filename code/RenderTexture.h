@@ -34,7 +34,7 @@
 #ifndef __RENDERTEXTURE_H
 #define __RENDERTEXTURE_H
 
-#include <NV/NvPlatformGL.h>
+#include <glad.h>
 
 
 /*
