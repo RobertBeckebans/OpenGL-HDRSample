@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------------------
 // File:        es3aep-kepler\HDR/VertexBufferObject.h
-// SDK Version: v3.00 
+// SDK Version: v3.00
 // Email:       gameworks@nvidia.com
 // Site:        http://developer.nvidia.com/
 //
@@ -34,19 +34,26 @@
 #ifndef __VERTEX_BUFFER_OBJECT_H
 #define __VERTEX_BUFFER_OBJECT_H
 
-#include <NV/NvPlatformGL.h>
+#include <glad.h>
 
-class VertexBufferObject {
+class VertexBufferObject
+{
 public:
 	VertexBufferObject();
 	~VertexBufferObject();
-	void GenVertexData(void *data, unsigned int length, bool stream=false);
-	void GenIndexData(void *data, unsigned int length, bool stream=false);
-	void AddAttribute(int attribute, int count, int type, bool noramlize, int stride, intptr_t offset);
-	void Draw(unsigned int type, unsigned int count, unsigned int data_type, intptr_t offset);
-	unsigned int GetVBO() { return m_vboId; }
-	unsigned int GetIBO() { return m_iboId; }
-
+	void GenVertexData( void* data, unsigned int length, bool stream = false );
+	void GenIndexData( void* data, unsigned int length, bool stream = false );
+	void AddAttribute( int attribute, int count, int type, bool noramlize, int stride, intptr_t offset );
+	void Draw( unsigned int type, unsigned int count, unsigned int data_type, intptr_t offset );
+	unsigned int GetVBO()
+	{
+		return m_vboId;
+	}
+	unsigned int GetIBO()
+	{
+		return m_iboId;
+	}
+	
 private:
 	unsigned int m_vboId;
 	unsigned int m_iboId;

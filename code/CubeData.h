@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------------------
 // File:        es3aep-kepler\HDR/CubeData.h
-// SDK Version: v3.00 
+// SDK Version: v3.00
 // Email:       gameworks@nvidia.com
 // Site:        http://developer.nvidia.com/
 //
@@ -41,12 +41,13 @@
 #define CUBE_SCLAE 6.0f
 
 // Interleaved vertex data
-float verticesCube[] = {
+float verticesCube[] =
+{
 	// Front Face
-	-CUBE_SCLAE,-CUBE_SCLAE, CUBE_SCLAE,
+	-CUBE_SCLAE, -CUBE_SCLAE, CUBE_SCLAE,
 	0.0f, 0.0f, 1.0f,
 	TEX_COORD_MINX, TEX_COORD_MINY,
-	CUBE_SCLAE,-CUBE_SCLAE, CUBE_SCLAE,
+	CUBE_SCLAE, -CUBE_SCLAE, CUBE_SCLAE,
 	0.0f, 0.0f, 1.0f,
 	TEX_COORD_MAXX, TEX_COORD_MINY,
 	CUBE_SCLAE, CUBE_SCLAE, CUBE_SCLAE,
@@ -55,21 +56,21 @@ float verticesCube[] = {
 	-CUBE_SCLAE, CUBE_SCLAE, CUBE_SCLAE,
 	0.0f, 0.0f, 1.0f,
 	TEX_COORD_MINX, TEX_COORD_MAXY,
-
+	
 	// Back Face
-	-CUBE_SCLAE,-CUBE_SCLAE,-CUBE_SCLAE,
-	0.0f, 0.0f,-1.0f,
+	-CUBE_SCLAE, -CUBE_SCLAE, -CUBE_SCLAE,
+	0.0f, 0.0f, -1.0f,
 	TEX_COORD_MINX, TEX_COORD_MINY,
-	CUBE_SCLAE,-CUBE_SCLAE,-CUBE_SCLAE,
-	0.0f, 0.0f,-1.0f,
+	CUBE_SCLAE, -CUBE_SCLAE, -CUBE_SCLAE,
+	0.0f, 0.0f, -1.0f,
 	TEX_COORD_MAXX, TEX_COORD_MINY,
-	CUBE_SCLAE, CUBE_SCLAE,-CUBE_SCLAE,
-	0.0f, 0.0f,-1.0f,
+	CUBE_SCLAE, CUBE_SCLAE, -CUBE_SCLAE,
+	0.0f, 0.0f, -1.0f,
 	TEX_COORD_MAXX, TEX_COORD_MAXY,
-	-CUBE_SCLAE, CUBE_SCLAE,-CUBE_SCLAE,
-	0.0f, 0.0f,-1.0f,
+	-CUBE_SCLAE, CUBE_SCLAE, -CUBE_SCLAE,
+	0.0f, 0.0f, -1.0f,
 	TEX_COORD_MINX, TEX_COORD_MAXY,
-
+	
 	// Top Face
 	-CUBE_SCLAE, CUBE_SCLAE, CUBE_SCLAE,
 	0.0f, 1.0f, 0.0f,
@@ -77,61 +78,62 @@ float verticesCube[] = {
 	CUBE_SCLAE, CUBE_SCLAE, CUBE_SCLAE,
 	0.0f, 1.0f, 0.0f,
 	TEX_COORD_MAXX, TEX_COORD_MINY,
-	CUBE_SCLAE, CUBE_SCLAE,-CUBE_SCLAE,
+	CUBE_SCLAE, CUBE_SCLAE, -CUBE_SCLAE,
 	0.0f, 1.0f, 0.0f,
 	TEX_COORD_MAXX, TEX_COORD_MAXY,
-	-CUBE_SCLAE, CUBE_SCLAE,-CUBE_SCLAE,
+	-CUBE_SCLAE, CUBE_SCLAE, -CUBE_SCLAE,
 	0.0f, 1.0f, 0.0f,
 	TEX_COORD_MINX, TEX_COORD_MAXY,
-
+	
 	// Bottom Face
-	-CUBE_SCLAE,-CUBE_SCLAE, CUBE_SCLAE,
-	0.0f,-1.0f, 0.0f,
+	-CUBE_SCLAE, -CUBE_SCLAE, CUBE_SCLAE,
+	0.0f, -1.0f, 0.0f,
 	TEX_COORD_MINX, TEX_COORD_MINY,
-	CUBE_SCLAE,-CUBE_SCLAE, CUBE_SCLAE,
-	0.0f,-1.0f, 0.0f,
+	CUBE_SCLAE, -CUBE_SCLAE, CUBE_SCLAE,
+	0.0f, -1.0f, 0.0f,
 	TEX_COORD_MAXX, TEX_COORD_MINY,
-	CUBE_SCLAE,-CUBE_SCLAE,-CUBE_SCLAE,
-	0.0f,-1.0f, 0.0f,
+	CUBE_SCLAE, -CUBE_SCLAE, -CUBE_SCLAE,
+	0.0f, -1.0f, 0.0f,
 	TEX_COORD_MAXX, TEX_COORD_MAXY,
-	-CUBE_SCLAE,-CUBE_SCLAE,-CUBE_SCLAE,
-	0.0f,-1.0f, 0.0f,
+	-CUBE_SCLAE, -CUBE_SCLAE, -CUBE_SCLAE,
+	0.0f, -1.0f, 0.0f,
 	TEX_COORD_MINX, TEX_COORD_MAXY,
-
+	
 	// Left Face
-	-CUBE_SCLAE,-CUBE_SCLAE,-CUBE_SCLAE,
+	-CUBE_SCLAE, -CUBE_SCLAE, -CUBE_SCLAE,
 	-1.0f, 0.0f, 0.0f,
 	TEX_COORD_MINX, TEX_COORD_MINY,
-	-CUBE_SCLAE,-CUBE_SCLAE, CUBE_SCLAE,
+	-CUBE_SCLAE, -CUBE_SCLAE, CUBE_SCLAE,
 	-1.0f, 0.0f, 0.0f,
 	TEX_COORD_MAXX, TEX_COORD_MINY,
 	-CUBE_SCLAE, CUBE_SCLAE, CUBE_SCLAE,
 	-1.0f, 0.0f, 0.0f,
 	TEX_COORD_MAXX, TEX_COORD_MAXY,
-	-CUBE_SCLAE, CUBE_SCLAE,-CUBE_SCLAE,
+	-CUBE_SCLAE, CUBE_SCLAE, -CUBE_SCLAE,
 	-1.0f, 0.0f, 0.0f,
 	TEX_COORD_MINX, TEX_COORD_MAXY,
-
+	
 	// Right Face
-	CUBE_SCLAE,-CUBE_SCLAE,-CUBE_SCLAE,
+	CUBE_SCLAE, -CUBE_SCLAE, -CUBE_SCLAE,
 	1.0f, 0.0f, 0.0f,
 	TEX_COORD_MINX, TEX_COORD_MINY,
-	CUBE_SCLAE,-CUBE_SCLAE, CUBE_SCLAE,
+	CUBE_SCLAE, -CUBE_SCLAE, CUBE_SCLAE,
 	1.0f, 0.0f, 0.0f,
 	TEX_COORD_MAXX, TEX_COORD_MINY,
 	CUBE_SCLAE, CUBE_SCLAE, CUBE_SCLAE,
 	1.0f, 0.0f, 0.0f,
 	TEX_COORD_MAXX, TEX_COORD_MAXY,
-	CUBE_SCLAE, CUBE_SCLAE,-CUBE_SCLAE,
+	CUBE_SCLAE, CUBE_SCLAE, -CUBE_SCLAE,
 	1.0f, 0.0f, 0.0f,
 	TEX_COORD_MINX, TEX_COORD_MAXY
 };
 
-static unsigned short indicesCube[] = {0,1,3,3,1,2,
-									4,7,5,7,6,5,
-									8,9,11,11,9,10,
-									12,15,13,15,14,13,
-									16,17,19,19,17,18,
-									20,23,21,23,22,21};
+static unsigned short indicesCube[] = {0, 1, 3, 3, 1, 2,
+									   4, 7, 5, 7, 6, 5,
+									   8, 9, 11, 11, 9, 10,
+									   12, 15, 13, 15, 14, 13,
+									   16, 17, 19, 19, 17, 18,
+									   20, 23, 21, 23, 22, 21
+									  };
 
 #endif  // _CUBEDATA_H_

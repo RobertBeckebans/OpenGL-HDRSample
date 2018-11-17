@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------------------
 // File:        es3aep-kepler\HDR/ShaderObject.h
-// SDK Version: v3.00 
+// SDK Version: v3.00
 // Email:       gameworks@nvidia.com
 // Site:        http://developer.nvidia.com/
 //
@@ -35,25 +35,29 @@
 #ifndef __CSHADER_OBJECT_H
 #define __CSHADER_OBJECT_H
 
-#include <NV/NvPlatformGL.h>
-#include "NvAppBase/gl/NvSampleAppGL.h"
+#include <glad.h>
+//#include "NvAppBase/gl/NvSampleAppGL.h"
 class CShaderObject
 {
 public:
-	CShaderObject() { Initialized = 0; pid = -1;}
+	CShaderObject()
+	{
+		Initialized = 0;
+		pid = -1;
+	}
 	~CShaderObject();
-
-	int GenProgram(const char* vertexShader, const char* fragmentShader, const char** Attribs, int AttribsArraySize, const char** Uniforms, int UniformsArraySize, const char** Textures, int TextureArraySize);
-	int GenProgram(const char* vertexShader, const char* fragmentShader);
-	int GenLocation(const char** Attribs, int AttribsArraySize, const char** Uniforms, int UniformsArraySize, const char** Textures, int TextureArraySize);
-	int GenCSProgram(const char* computeShader, const char** Uniforms=0, int UniformsArraySize=0, const char** Textures=0, int TextureArraySize=0);
+	
+	int GenProgram( const char* vertexShader, const char* fragmentShader, const char** Attribs, int AttribsArraySize, const char** Uniforms, int UniformsArraySize, const char** Textures, int TextureArraySize );
+	int GenProgram( const char* vertexShader, const char* fragmentShader );
+	int GenLocation( const char** Attribs, int AttribsArraySize, const char** Uniforms, int UniformsArraySize, const char** Textures, int TextureArraySize );
+	int GenCSProgram( const char* computeShader, const char** Uniforms = 0, int UniformsArraySize = 0, const char** Textures = 0, int TextureArraySize = 0 );
 	
 	void Release();
 	int	auiLocation[32];
-	int pid;	
+	int pid;
 	int	Initialized;
-    int	hashA;
-    int hashB;
+	int	hashA;
+	int hashB;
 };
 
 #endif // __CSHADER_OBJECT_H

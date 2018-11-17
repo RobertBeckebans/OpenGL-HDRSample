@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------------------
 // File:        es3aep-kepler\HDR/AppExtensions.h
-// SDK Version: v3.00 
+// SDK Version: v3.00
 // Email:       gameworks@nvidia.com
 // Site:        http://developer.nvidia.com/
 //
@@ -34,8 +34,8 @@
 #ifndef APP_EXTENSIONS_H
 #define APP_EXTENSIONS_H
 
+#include <glad.h>
 #include <NvSimpleTypes.h>
-#include <NV/NvPlatformGL.h>
 #include "KHR/khrplatform.h"
 
 extern uint32_t gLumaTypeEnum;

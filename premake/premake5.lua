@@ -24,10 +24,6 @@ solution "HDROpenGLSample"
 		vectorextensions "SSE"
 		optimize "Speed"
 		warnings "Extra"
-			
-		if not os.is("windows") then
-			staticruntime "On"
-		end
 
 	configuration "Release"
 		defines
@@ -133,12 +129,19 @@ project "HDROpenGLSample"
 	{
 		"../code/**.h", "../code/**.cpp",
 		"../externals/glad.c",
+		
+		"../externals/NV/**.h",
+		"../externals/NvGLUtils/**.h",
+		"../externals/NvGLUtils/NvGLSLProgram.cpp",
 	}
 	includedirs
 	{
 		"../externals/SDL2/include",
 		"../externals/KHR",
 		"../externals/glad",
+		
+		"../externals/NV",
+		"../externals/NvGLUtils",
 	}
 		
 	configuration { "vs*", "x64" }

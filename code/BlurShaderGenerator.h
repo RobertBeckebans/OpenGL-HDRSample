@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------------------
 // File:        es3aep-kepler\HDR/BlurShaderGenerator.h
-// SDK Version: v3.00 
+// SDK Version: v3.00
 // Email:       gameworks@nvidia.com
 // Site:        http://developer.nvidia.com/
 //
@@ -34,10 +34,10 @@
 #ifndef _BLUR_SHADER_GENERATOR_H_
 #define _BLUR_SHADER_GENERATOR_H_
 
-#include "NvGLUtils/NvGLSLProgram.h"
+#include <NvGLSLProgram.h>
 
-float *generateGaussianWeights(float s, int &n);
-float *generateTriangleWeights(int width);
-unsigned int  generate1DConvolutionFP_filter(const char* vs, float *weights, int width, bool vertical, bool tex2D, int img_width, int img_height);
+float* generateGaussianWeights( float s, int& n );
+float* generateTriangleWeights( int width );
+unsigned int  generate1DConvolutionFP_filter( const char* vs, float* weights, int width, bool vertical, bool tex2D, int img_width, int img_height );
 
 #endif //_BLUR_SHADER_GENERATOR_H_

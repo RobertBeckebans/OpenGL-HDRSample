@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------------------
 // File:        es3aep-kepler\HDR/RenderTexture.h
-// SDK Version: v3.00 
+// SDK Version: v3.00
 // Email:       gameworks@nvidia.com
 // Site:        http://developer.nvidia.com/
 //
@@ -41,22 +41,25 @@
 #ifndef ANDROID
 #define GL_HALF_FLOAT_OES GL_HALF_FLOAT
 #define GL_DEPTH_COMPONENT24_OES GL_DEPTH_COMPONENT24
-#define FLOAT_INTERNAL_RGB GL_RGBA16F_ARB 
-#define FLOAT_INTERNAL_RGBA GL_RGBA16F_ARB 
+#define FLOAT_INTERNAL_RGB GL_RGBA16F_ARB
+#define FLOAT_INTERNAL_RGBA GL_RGBA16F_ARB
 #else
 #define FLOAT_INTERNAL_RGBA GL_RGBA
 #define FLOAT_INTERNAL_RGB GL_RGB
 #endif
 */
 
-class RenderTexture {
+class RenderTexture
+{
 public:
-	enum DepthType {
+	enum DepthType
+	{
 		Depth24,
 		Depth16,
 		NoDepth
 	};
-	enum ColorType {
+	enum ColorType
+	{
 		RGB888,
 		RGBA8888,
 		HDR = 0xFFFF,
@@ -64,27 +67,38 @@ public:
 		RGB16F,
 		RGBA16F,
 	};
-
+	
 	RenderTexture();
 	~RenderTexture();
-	bool Init(int width, int height, ColorType color, DepthType depth);
-	bool InitWithPBO(int width, int height, ColorType color, DepthType depth);
-	void GetTextureData(void* pData);
-	void SetPBOData(void* pData);
-
+	bool Init( int width, int height, ColorType color, DepthType depth );
+	bool InitWithPBO( int width, int height, ColorType color, DepthType depth );
+	void GetTextureData( void* pData );
+	void SetPBOData( void* pData );
+	
 	void ActivateFB();
 	//void DeactivateFB();
-	int GetWidth() {
+	int GetWidth()
+	{
 		return m_width;
 	}
-	int GetHeight() {
+	int GetHeight()
+	{
 		return m_height;
 	}
-	void Bind() { glBindTexture(GL_TEXTURE_2D, m_texId); }
-	void Release() { glBindTexture(GL_TEXTURE_2D, 0); }
-	unsigned int GetTexId() { return m_texId; } 
+	void Bind()
+	{
+		glBindTexture( GL_TEXTURE_2D, m_texId );
+	}
+	void Release()
+	{
+		glBindTexture( GL_TEXTURE_2D, 0 );
+	}
+	unsigned int GetTexId()
+	{
+		return m_texId;
+	}
 	static bool ms_useFiltering;
-
+	
 private:
 	int m_width;
 	int m_height;

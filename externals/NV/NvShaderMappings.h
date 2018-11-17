@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------------------
-// File:        es3aep-kepler\HDR/FileLoader.cpp
-// SDK Version: v3.00
+// File:        NV/NvShaderMappings.h
+// SDK Version: v3.00 
 // Email:       gameworks@nvidia.com
 // Site:        http://developer.nvidia.com/
 //
@@ -31,71 +31,63 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 //----------------------------------------------------------------------------------
-#include "FileLoader.h"
-#include <NvAssetLoader.h>
-#include <string.h>
-#include <algorithm>
 
-struct NvFile
+#ifndef NV_SHADER_MAPPINGS_H
+#define NV_SHADER_MAPPINGS_H
+
+/// \file
+/// This file allows applications to use a single file to declare the uniforms in a
+/// GLSL shader AND C++ code.  The idea is to declare the uniforms in one file that
+/// is included in both the shader code and the C++ code.  This simplifies the use
+/// of Uniform Buffer Objects, and avoids having the C++ struct fall out of sync with
+/// the GLSL.  Sync failures between C++ and GLSL can lead to difficult-to-track bugs
+
+#if defined(ANDROID) || defined(LINUX)
+#define ALIGN(a)__attribute__ ((aligned (a)))
+#else
+#define ALIGN(a) __declspec(align(a))
+#endif
+
+namespace nv {
+// Matrices, must align to 4 vector (16 bytes)
+#define SDK_MAT4 ALIGN(16) nv::matrix4f
+
+///@{
+/// vectors.
+/// vectors, 4-tuples and 3-tuples must align to 16 bytes
+///  2-vectors must align to 8 bytes
+#define SDK_VEC4 ALIGN(16) nv::vec4f
+#define SDK_VEC3 ALIGN(16) nv::vec3f
+#define SDK_VEC2 ALIGN(8) nv::vec2f
+
+#define ivec4 ALIGN(16) nv::vec4i
+#define ivec3 ALIGN(16) nv::vec3i
+#define ivec2 ALIGN(8) nv::vec2i
+
+#define uivec4 ALIGN(16) nv::vec4ui
+#define uivec3 ALIGN(16) nv::vec3ui
+#define uivec2 ALIGN(8) nv::vec2ui
+///@}
+
+///@{
+/// scalars.
+///  uint can be a typedef
+///  bool needs special padding / alignment
+#define SDK_BOOL ALIGN(4) nv::boolClass
+#define uint unsigned int
+///@}
+
+/// class to make uint look like bool to make GLSL packing rules happy
+struct boolClass
 {
-	int32_t mLen;
-	int32_t mIndex;
-	char* mData;
+    unsigned int _rep;
+
+    boolClass() : _rep(false) {}
+    boolClass( bool b) : _rep(b) {}
+    operator bool() { return _rep == 0 ? false : true; }
+    boolClass& operator=( bool b) { _rep = b; return *this; }
 };
 
-NvFile* NvFOpen( char const* path )
-{
-	NvFile* file = new NvFile;
-	file->mData = NvAssetLoaderRead( path, file->mLen );
-	file->mIndex = 0;
-	return file;
-}
+};
 
-void NvFClose( NvFile* file )
-{
-	NvAssetLoaderFree( file->mData );
-	delete file;
-}
-
-char* NvFGets( char* s, int size, NvFile* stream )
-{
-	char* ptr = s;
-	
-	if( stream->mIndex == stream->mLen || !size )
-		return NULL;
-		
-	while( stream->mIndex < stream->mLen )
-	{
-		if( size == 1 )
-		{
-			break;
-		}
-		
-		char next = stream->mData[stream->mIndex++];
-		*( ptr++ ) = next;
-		size--;
-		
-		if( next == '\r' || next == '\n' )
-		{
-			break;
-		}
-	}
-	
-	// terminator (we always terminate when there is at least one byte
-	// of space in the output buffer)
-	*ptr = '\0';
-	
-	return s;
-}
-
-size_t NvFRead( void* ptr, size_t size, size_t nmemb, NvFile* stream )
-{
-	size_t totalCount = ( stream->mLen - stream->mIndex ) / size;
-	totalCount = ( totalCount > nmemb ) ? nmemb : totalCount;
-	
-	memcpy( ptr, stream->mData + stream->mIndex, size * totalCount );
-	stream->mIndex += int32_t( size * totalCount );
-	
-	return totalCount;
-}
-
+#endif

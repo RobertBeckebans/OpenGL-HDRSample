@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------------------
 // File:        es3aep-kepler\HDR/ShaderDeclaration.h
-// SDK Version: v3.00 
+// SDK Version: v3.00
 // Email:       gameworks@nvidia.com
 // Site:        http://developer.nvidia.com/
 //
@@ -36,12 +36,18 @@
 
 
 //////////////MatteObject///////////////
-const char* atb_matteObject[] = {
-	"PosAttribute", "myNormal", "uvTexCoord" };
-const char* uni_matteObject[] = {
-"viewProjMatrix", "ModelMatrix", "eyePos", "emission", "color"};
-const char* spl_matteObject[] = {
-"envMap","envMapIrrad","diffuseMap"};
+const char* atb_matteObject[] =
+{
+	"PosAttribute", "myNormal", "uvTexCoord"
+};
+const char* uni_matteObject[] =
+{
+	"viewProjMatrix", "ModelMatrix", "eyePos", "emission", "color"
+};
+const char* spl_matteObject[] =
+{
+	"envMap", "envMapIrrad", "diffuseMap"
+};
 const char* vtx_matteObject = "\
 precision highp float;\
 attribute vec3 PosAttribute;\
@@ -95,12 +101,18 @@ void main()\
 
 
 //////////////refractObject///////////////
-const char* atb_refractObject[] = {
-	"PosAttribute", "myNormal" };
-const char* uni_refractObject[] = {
-"viewProjMatrix", "ModelMatrix", "eyePos", "emission", "color"};
-const char* spl_refractObject[] = {
-"envMap"};
+const char* atb_refractObject[] =
+{
+	"PosAttribute", "myNormal"
+};
+const char* uni_refractObject[] =
+{
+	"viewProjMatrix", "ModelMatrix", "eyePos", "emission", "color"
+};
+const char* spl_refractObject[] =
+{
+	"envMap"
+};
 const char* vtx_refractObject = "\
 precision highp float;\
 attribute vec3 PosAttribute;\
@@ -155,12 +167,18 @@ void main()\
 }";
 
 //////////////reflectObject///////////////
-const char* atb_reflectObject[] = {
-	"PosAttribute", "myNormal" };
-const char* uni_reflectObject[] = {
-"viewProjMatrix", "ModelMatrix", "eyePos", "emission", "color"};
-const char* spl_reflectObject[] = {
-"envMap","envMapRough"};
+const char* atb_reflectObject[] =
+{
+	"PosAttribute", "myNormal"
+};
+const char* uni_reflectObject[] =
+{
+	"viewProjMatrix", "ModelMatrix", "eyePos", "emission", "color"
+};
+const char* spl_reflectObject[] =
+{
+	"envMap", "envMapRough"
+};
 const char* vtx_reflectObject = "\
 precision highp float;\
 attribute vec3 PosAttribute;\
@@ -209,12 +227,18 @@ void main()\
 }";
 
 //////////////skyBoxRender///////////////
-const char* atb_skybox[] = {
-	"PosAttribute" };
-const char* uni_skybox[] = {
-"viewMatrix", "ProjMatrix"};
-const char* spl_skybox[] = {
-"envMap"};
+const char* atb_skybox[] =
+{
+	"PosAttribute"
+};
+const char* uni_skybox[] =
+{
+	"viewMatrix", "ProjMatrix"
+};
+const char* spl_skybox[] =
+{
+	"envMap"
+};
 const char* vtx_skybox = "\
 precision highp float;\
 attribute vec3 PosAttribute;\
@@ -239,12 +263,18 @@ void main()\
 
 
 //////////////downSample///////////////
-const char* atb_downSample[] = {
-	"PosAttribute", "TexAttribute" };
-const char* uni_downSample[] = {
-"mvp"};
-const char* spl_downSample[] = {
-"sampler"};
+const char* atb_downSample[] =
+{
+	"PosAttribute", "TexAttribute"
+};
+const char* uni_downSample[] =
+{
+	"mvp"
+};
+const char* spl_downSample[] =
+{
+	"sampler"
+};
 
 const char* vtx_downSample = "\
 precision highp float;\
@@ -268,12 +298,18 @@ void main()\
 
 
 //////////////downSample4x///////////////
-const char* atb_downSample4x[] = {
-	"PosAttribute", "TexAttribute" };
-const char* uni_downSample4x[] = {
-"twoTexelSize"};
-const char* spl_downSample4x[] = {
-"sampler"};
+const char* atb_downSample4x[] =
+{
+	"PosAttribute", "TexAttribute"
+};
+const char* uni_downSample4x[] =
+{
+	"twoTexelSize"
+};
+const char* spl_downSample4x[] =
+{
+	"sampler"
+};
 const char* vtx_downSample4x = "\
 precision highp float;\
 attribute vec3 PosAttribute; \
@@ -309,12 +345,18 @@ void main()\
 
 
 //////////////extractHighLightArea///////////////
-const char* atb_extractHL[] = {
-	"PosAttribute", "TexAttribute" };
-const char* uni_extractHL[] = {
-"threshold","scalar"};
-const char* spl_extractHL[] = {
-"sampler"};
+const char* atb_extractHL[] =
+{
+	"PosAttribute", "TexAttribute"
+};
+const char* uni_extractHL[] =
+{
+	"threshold", "scalar"
+};
+const char* spl_extractHL[] =
+{
+	"sampler"
+};
 const char* vtx_extractHL = "\
 precision highp float;\
 attribute vec3 PosAttribute;\
@@ -338,12 +380,18 @@ void main()\
 }";
 
 //////////////gaussian blur///////////////
-const char* atb_blur[] = {
-	"PosAttribute", "TexAttribute" };
-const char* uni_blur[] = {
-"MVPMatrix"};
-const char* spl_blur[] = {
-"TexSampler"};
+const char* atb_blur[] =
+{
+	"PosAttribute", "TexAttribute"
+};
+const char* uni_blur[] =
+{
+	"MVPMatrix"
+};
+const char* spl_blur[] =
+{
+	"TexSampler"
+};
 const char* vtx_blur = "\
 precision highp float;\
 attribute vec3  PosAttribute;\
@@ -357,12 +405,18 @@ void main()\
 
 
 //////////////gaussian blur composition///////////////
-const char* atb_gaussianCompose[] = {
-	"PosAttribute", "TexAttribute" };
-const char* uni_gaussianCompose[] = {
-"coeff"};
-const char* spl_gaussianCompose[] = {
-"sampler1","sampler2","sampler3","sampler4"};
+const char* atb_gaussianCompose[] =
+{
+	"PosAttribute", "TexAttribute"
+};
+const char* uni_gaussianCompose[] =
+{
+	"coeff"
+};
+const char* spl_gaussianCompose[] =
+{
+	"sampler1", "sampler2", "sampler3", "sampler4"
+};
 const char* vtx_gaussianCompose = "\
 precision highp float;\
 attribute vec3 PosAttribute;\
@@ -389,12 +443,18 @@ void main()\
 
 
 //////////////star glare///////////////
-const char* atb_starStreak[] = {
-	"PosAttribute", "TexAttribute" };
-const char* uni_starStreak[] = {
-"stepSize","Stride","colorCoeff"};
-const char* spl_starStreak[] = {
-"sampler"};
+const char* atb_starStreak[] =
+{
+	"PosAttribute", "TexAttribute"
+};
+const char* uni_starStreak[] =
+{
+	"stepSize", "Stride", "colorCoeff"
+};
+const char* spl_starStreak[] =
+{
+	"sampler"
+};
 
 const char* vtx_starStreak = "\
 precision highp float;\
@@ -429,12 +489,18 @@ void main()\
 }";
 
 //////////////glare composition///////////////
-const char* atb_glareCompose[] = {
-	"PosAttribute", "TexAttribute" };
-const char* uni_glareCompose[] = {
-"mixCoeff"};
-const char* spl_glareCompose[] = {
-"sampler1","sampler2","sampler3"};
+const char* atb_glareCompose[] =
+{
+	"PosAttribute", "TexAttribute"
+};
+const char* uni_glareCompose[] =
+{
+	"mixCoeff"
+};
+const char* spl_glareCompose[] =
+{
+	"sampler1", "sampler2", "sampler3"
+};
 
 const char* vtx_glareCompose = "\
 precision highp float;\
@@ -461,12 +527,18 @@ void main()\
 
 
 //////////////star streak composition///////////////
-const char* atb_starStreakCompose[] = {
-	"PosAttribute", "TexAttribute" };
-const char* uni_starStreakCompose[] = {
-"coeff"};
-const char* spl_starStreakCompose[] = {
-"sampler1","sampler2","sampler3","sampler4"};
+const char* atb_starStreakCompose[] =
+{
+	"PosAttribute", "TexAttribute"
+};
+const char* uni_starStreakCompose[] =
+{
+	"coeff"
+};
+const char* spl_starStreakCompose[] =
+{
+	"sampler1", "sampler2", "sampler3", "sampler4"
+};
 
 const char* vtx_starStreakCompose = "\
 precision highp float;\
@@ -496,12 +568,18 @@ void main()\
 
 
 //////////////ghost image///////////////
-const char* atb_ghostImage[] = {
-	"PosAttribute", "TexAttribute" };
-const char* uni_ghostImage[] = {
-"scalar","colorCoeff"};
-const char* spl_ghostImage[] = {
-"sampler1","sampler2","sampler3","sampler4"};
+const char* atb_ghostImage[] =
+{
+	"PosAttribute", "TexAttribute"
+};
+const char* uni_ghostImage[] =
+{
+	"scalar", "colorCoeff"
+};
+const char* spl_ghostImage[] =
+{
+	"sampler1", "sampler2", "sampler3", "sampler4"
+};
 
 const char* vtx_ghostImage = "\
 precision highp float;\
@@ -537,16 +615,22 @@ void main()\
 	gl_FragColor = texture2D(sampler1, TexCoord1)*texture2D(sampler4, TexCoord1).g*colorCoeff[0] + texture2D(sampler1, TexCoord2)*texture2D(sampler4, TexCoord2).g*colorCoeff[1] + texture2D(sampler2, TexCoord3)*texture2D(sampler4, TexCoord3).g*colorCoeff[2] + texture2D(sampler3, TexCoord4)*texture2D(sampler4, TexCoord4).g*colorCoeff[3];\
 }";
 
-	//gl_FragColor = texture2D(sampler1, TexCoord4);\
+//gl_FragColor = texture2D(sampler1, TexCoord4);\
 
 
 //////////////tonemapping///////////////
-const char* atb_tonemap[] = {
-	"PosAttribute", "TexAttribute" };
-const char* uni_tonemap[] = {
-"blurAmount","exposure","gamma"};
-const char* spl_tonemap[] = {
-"sceneTex","blurTex","lumTex"};
+const char* atb_tonemap[] =
+{
+	"PosAttribute", "TexAttribute"
+};
+const char* uni_tonemap[] =
+{
+	"blurAmount", "exposure", "gamma"
+};
+const char* spl_tonemap[] =
+{
+	"sceneTex", "blurTex", "lumTex"
+};
 const char* vtx_tonemap = "\
 precision highp float;\
 attribute vec3 PosAttribute;\
@@ -604,10 +688,14 @@ void main()\
 //		gl_FragColor = vec4(lum,lum,lum,1.0);\
 
 //////////////calculateLuminance///////////////
-const char* uni_calculateLuminance[] = {
-"blurAmount"};
-const char* tex_calculateLuminance[] = {
-"inputImage","outputImage"};
+const char* uni_calculateLuminance[] =
+{
+	"blurAmount"
+};
+const char* tex_calculateLuminance[] =
+{
+	"inputImage", "outputImage"
+};
 const char* cs_calculateLuminance = "\
 #version 430\n\
 layout (local_size_x =1, local_size_y = 1) in;\n\
@@ -650,10 +738,14 @@ void main()\n\
 }";
 
 //////////////calculateAdaptiveLum///////////////
-const char* uni_calculateAdaptedLum[] = {
-"elapsedTime"};
-const char* tex_calculateAdaptedLum[] = {
-"currentImage","image0","image1"};
+const char* uni_calculateAdaptedLum[] =
+{
+	"elapsedTime"
+};
+const char* tex_calculateAdaptedLum[] =
+{
+	"currentImage", "image0", "image1"
+};
 const char* cs_calculateAdaptedLum = "\
 #version 430\n\
 layout (local_size_x =1, local_size_y = 1) in;\n\

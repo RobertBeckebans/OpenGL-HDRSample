@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------------------
-// File:        es3aep-kepler\HDR/FileLoader.cpp
-// SDK Version: v3.00
+// File:        NV/NvLogs.h
+// SDK Version: v3.00 
 // Email:       gameworks@nvidia.com
 // Site:        http://developer.nvidia.com/
 //
@@ -31,71 +31,21 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 //----------------------------------------------------------------------------------
-#include "FileLoader.h"
-#include <NvAssetLoader.h>
-#include <string.h>
-#include <algorithm>
 
-struct NvFile
-{
-	int32_t mLen;
-	int32_t mIndex;
-	char* mData;
-};
+#ifndef NV_LOGS_H
+#define NV_LOGS_H
 
-NvFile* NvFOpen( char const* path )
-{
-	NvFile* file = new NvFile;
-	file->mData = NvAssetLoaderRead( path, file->mLen );
-	file->mIndex = 0;
-	return file;
-}
+#include <NvSimpleTypes.h>
 
-void NvFClose( NvFile* file )
-{
-	NvAssetLoaderFree( file->mData );
-	delete file;
-}
+/// \file
+/// Cross-platform application logging to file and console.
+/// - LOGI(...) printf-style "info" logging
+/// - LOGE(...) printf-style "error" logging
+/// - CHECK_GL_ERROR() check the current GL error status and log any error
 
-char* NvFGets( char* s, int size, NvFile* stream )
-{
-	char* ptr = s;
-	
-	if( stream->mIndex == stream->mLen || !size )
-		return NULL;
-		
-	while( stream->mIndex < stream->mLen )
-	{
-		if( size == 1 )
-		{
-			break;
-		}
-		
-		char next = stream->mData[stream->mIndex++];
-		*( ptr++ ) = next;
-		size--;
-		
-		if( next == '\r' || next == '\n' )
-		{
-			break;
-		}
-	}
-	
-	// terminator (we always terminate when there is at least one byte
-	// of space in the output buffer)
-	*ptr = '\0';
-	
-	return s;
-}
+extern void NVPlatformLog(const char* fmt, ...);
 
-size_t NvFRead( void* ptr, size_t size, size_t nmemb, NvFile* stream )
-{
-	size_t totalCount = ( stream->mLen - stream->mIndex ) / size;
-	totalCount = ( totalCount > nmemb ) ? nmemb : totalCount;
-	
-	memcpy( ptr, stream->mData + stream->mIndex, size * totalCount );
-	stream->mIndex += int32_t( size * totalCount );
-	
-	return totalCount;
-}
+#define LOGI(...) { NVPlatformLog(__VA_ARGS__); }
+#define LOGE(...) { NVPlatformLog(__VA_ARGS__); }
 
+#endif

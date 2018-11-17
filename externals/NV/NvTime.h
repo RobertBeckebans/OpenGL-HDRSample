@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------------------
-// File:        es3aep-kepler\HDR/FileLoader.cpp
-// SDK Version: v3.00
+// File:        NV/NvTime.h
+// SDK Version: v3.00 
 // Email:       gameworks@nvidia.com
 // Site:        http://developer.nvidia.com/
 //
@@ -31,71 +31,43 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 //----------------------------------------------------------------------------------
-#include "FileLoader.h"
-#include <NvAssetLoader.h>
-#include <string.h>
-#include <algorithm>
 
-struct NvFile
-{
-	int32_t mLen;
-	int32_t mIndex;
-	char* mData;
-};
+#ifndef _NV_TIME_H
+#define _NV_TIME_H
 
-NvFile* NvFOpen( char const* path )
+#include <time.h>
+
+/** Generalize a 64-bit integer time value in nanoseconds. */
+typedef uint64_t               NvUST; // U64 unadjusted system time value
+/** Convert 64-bit nsecs value to floating-point seconds. */
+#define UST2SECS(t)     ((double)(((double)(t)) / 1.0e9))
+/** Convert floating-point seconds to a 64-bit nsecs value. */
+#define SECS2UST(t)     ((NvUST)(((double)(t)) * 1.0e9))
+
+/** Convert nsecs value to ms value. */
+#define UST2MS(t)     ((t) / (NvUST)(1000000))
+/** Convert ms to 64-bit nsecs value. */
+#define MS2UST(t)     ((t) * (NvUST)(1000000))
+
+inline NvUST NvTimeGetTime()
 {
-	NvFile* file = new NvFile;
-	file->mData = NvAssetLoaderRead( path, file->mLen );
-	file->mIndex = 0;
-	return file;
+    NvUST nowu;
+#ifdef _WIN32
+    clock_t now = clock(); // clocks are really ms...
+    nowu = MS2UST(now);
+#else
+    struct timespec now;
+    clock_gettime(CLOCK_MONOTONIC, &now);
+    nowu = SECS2UST(now.tv_sec) + now.tv_nsec;
+#endif
+    return nowu;
 }
 
-void NvFClose( NvFile* file )
+inline float NvTimeDiffInSecs(NvUST newTime, NvUST oldTime)
 {
-	NvAssetLoaderFree( file->mData );
-	delete file;
+    if (oldTime<newTime)
+        return (float)UST2SECS(newTime-oldTime);
+    return 0; // !!!!!TBD should this return 1 just to 'tick' a bit?
 }
 
-char* NvFGets( char* s, int size, NvFile* stream )
-{
-	char* ptr = s;
-	
-	if( stream->mIndex == stream->mLen || !size )
-		return NULL;
-		
-	while( stream->mIndex < stream->mLen )
-	{
-		if( size == 1 )
-		{
-			break;
-		}
-		
-		char next = stream->mData[stream->mIndex++];
-		*( ptr++ ) = next;
-		size--;
-		
-		if( next == '\r' || next == '\n' )
-		{
-			break;
-		}
-	}
-	
-	// terminator (we always terminate when there is at least one byte
-	// of space in the output buffer)
-	*ptr = '\0';
-	
-	return s;
-}
-
-size_t NvFRead( void* ptr, size_t size, size_t nmemb, NvFile* stream )
-{
-	size_t totalCount = ( stream->mLen - stream->mIndex ) / size;
-	totalCount = ( totalCount > nmemb ) ? nmemb : totalCount;
-	
-	memcpy( ptr, stream->mData + stream->mIndex, size * totalCount );
-	stream->mIndex += int32_t( size * totalCount );
-	
-	return totalCount;
-}
-
+#endif //_NV_TIME_H

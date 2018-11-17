@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------------------
-// File:        es3aep-kepler\HDR/FileLoader.cpp
-// SDK Version: v3.00
+// File:        NV/NvString.h
+// SDK Version: v3.00 
 // Email:       gameworks@nvidia.com
 // Site:        http://developer.nvidia.com/
 //
@@ -31,71 +31,48 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 //----------------------------------------------------------------------------------
-#include "FileLoader.h"
-#include <NvAssetLoader.h>
-#include <string.h>
-#include <algorithm>
 
-struct NvFile
-{
-	int32_t mLen;
-	int32_t mIndex;
-	char* mData;
-};
+#ifndef NV_STRING_H
+#define NV_STRING_H
 
-NvFile* NvFOpen( char const* path )
-{
-	NvFile* file = new NvFile;
-	file->mData = NvAssetLoaderRead( path, file->mLen );
-	file->mIndex = 0;
-	return file;
+#include <NvSimpleTypes.h>
+#include <string>
+#include <stdio.h>
+#include <stdarg.h>
+
+/// \file
+/// Cross-platform string handling for 'printf' needs.
+
+#ifdef _WIN32
+#define safe_vsnprintf(buf, sz, mx, fmt, ap) vsnprintf_s(buf, sz, mx, fmt, ap)
+#else
+#define safe_vsnprintf(buf, sz, mx, fmt, ap) vsnprintf(buf, sz, fmt, ap)
+#endif
+
+#ifdef _WIN32
+// redefine posix standards to things windows will like...
+#define strtok_r    strtok_s
+#endif
+
+inline void NvStringPrint(char *outbuf, uint32_t outsize, const char* fmt, ...) {
+    va_list ap;  
+    va_start(ap, fmt);
+    safe_vsnprintf(outbuf, outsize-1, outsize-2, fmt, ap);
+    outbuf[outsize-1] = 0; // safety null.
+    va_end(ap);
 }
 
-void NvFClose( NvFile* file )
-{
-	NvAssetLoaderFree( file->mData );
-	delete file;
+inline void NvStringPrint(std::string s, const char* fmt, ...) {
+    const int outsize = 2048;
+    char outbuf[outsize];
+
+    va_list ap;  
+    va_start(ap, fmt);
+    s.clear();
+    safe_vsnprintf(outbuf, outsize-1, outsize-2, fmt, ap);
+    outbuf[outsize-1] = 0; // safety null.
+    s.append(outbuf);
+    va_end(ap);
 }
 
-char* NvFGets( char* s, int size, NvFile* stream )
-{
-	char* ptr = s;
-	
-	if( stream->mIndex == stream->mLen || !size )
-		return NULL;
-		
-	while( stream->mIndex < stream->mLen )
-	{
-		if( size == 1 )
-		{
-			break;
-		}
-		
-		char next = stream->mData[stream->mIndex++];
-		*( ptr++ ) = next;
-		size--;
-		
-		if( next == '\r' || next == '\n' )
-		{
-			break;
-		}
-	}
-	
-	// terminator (we always terminate when there is at least one byte
-	// of space in the output buffer)
-	*ptr = '\0';
-	
-	return s;
-}
-
-size_t NvFRead( void* ptr, size_t size, size_t nmemb, NvFile* stream )
-{
-	size_t totalCount = ( stream->mLen - stream->mIndex ) / size;
-	totalCount = ( totalCount > nmemb ) ? nmemb : totalCount;
-	
-	memcpy( ptr, stream->mData + stream->mIndex, size * totalCount );
-	stream->mIndex += int32_t( size * totalCount );
-	
-	return totalCount;
-}
-
+#endif

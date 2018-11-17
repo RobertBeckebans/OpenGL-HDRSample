@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------------------
 // File:        es3aep-kepler\HDR/FileLoader.h
-// SDK Version: v3.00 
+// SDK Version: v3.00
 // Email:       gameworks@nvidia.com
 // Site:        http://developer.nvidia.com/
 //
@@ -40,19 +40,19 @@ struct NvFile;
 
 /**
   A wrapper similar to fopen.  Only provides read-access to files, since the
-  file returned may be in the read-only APK.  Can be called from any 
+  file returned may be in the read-only APK.  Can be called from any
   JNI-connected thread.
-  @param path The path to the file.  This path is searched within /data and 
+  @param path The path to the file.  This path is searched within /data and
   within the APK
   @return A pointer to an open file on success, NULL on failure
   */
-NvFile*     NvFOpen(char const* path);
+NvFile*     NvFOpen( char const* path );
 
 /**
   A wrapper similar to fclose.  Can be called from any JNI-connected thread.
   @param file A pointer to an open file opened via NvFOpen()
   */
-void        NvFClose(NvFile* file);
+void        NvFClose( NvFile* file );
 
 /**
   A wrapper similar to fgets.  Can be called from any JNI-connected thread.
@@ -61,7 +61,7 @@ void        NvFClose(NvFile* file);
   @param stream A pointer to an open file opened via NvFOpen()
   @return A pointer to s on success or NULL on failure
   */
-char*       NvFGets(char* s, int size, NvFile* stream);
+char*       NvFGets( char* s, int size, NvFile* stream );
 
 /**
   A wrapper similar to fread.  Can be called from any JNI-connected thread.
@@ -71,6 +71,6 @@ char*       NvFGets(char* s, int size, NvFile* stream);
   @param stream A pointer to an open file opened via NvFOpen()
   @return The number of elements read
   */
-size_t      NvFRead(void* ptr, size_t size, size_t nmemb, NvFile* stream);
+size_t      NvFRead( void* ptr, size_t size, size_t nmemb, NvFile* stream );
 
 #endif

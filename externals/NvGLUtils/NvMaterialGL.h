@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------------------
-// File:        es3aep-kepler\HDR/FileLoader.cpp
-// SDK Version: v3.00
+// File:        NvGLUtils/NvMaterialGL.h
+// SDK Version: v3.00 
 // Email:       gameworks@nvidia.com
 // Site:        http://developer.nvidia.com/
 //
@@ -31,71 +31,63 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 //----------------------------------------------------------------------------------
-#include "FileLoader.h"
-#include <NvAssetLoader.h>
-#include <string.h>
-#include <algorithm>
+#ifndef NVGLMATERIAL_H_
+#define NVGLMATERIAL_H_
+#pragma once
 
-struct NvFile
-{
-	int32_t mLen;
-	int32_t mIndex;
-	char* mData;
-};
+#include "NV/NvPlatformGL.h"
+#include "NV/NvMath.h"
 
-NvFile* NvFOpen( char const* path )
+#include <string>
+
+namespace Nv
 {
-	NvFile* file = new NvFile;
-	file->mData = NvAssetLoaderRead( path, file->mLen );
-	file->mIndex = 0;
-	return file;
+    class NvModelExt;
+
+    // Simple class to hold values for a material, which can be 
+    // used when rendering an NvGLMeshExt
+    class NvMaterialGL
+    {
+    public:
+        NvMaterialGL(){}
+
+        /// Initializes material attributes from the material in the given
+        /// model at the given index.
+        /// \param[in] pModel Pointer to the source model that contains the
+        ///             material definitions.
+        /// \param[in] materialIndex Index of the material to get properties from
+        /// \return True if the material could be initialized from the requested
+        ///         model and material index.  False if there was a problem and
+        ///         the material could not be initialized.
+        bool InitFromMaterial(NvModelExt* pModel, uint32_t materialIndex);
+
+        // Material Name
+        std::string m_name;
+
+        // Ambient Color
+        nv::vec3f m_ambient;
+
+        // Diffuse Color
+        nv::vec3f m_diffuse;
+
+        // Emissive Color
+        nv::vec3f m_emissive;
+
+        // Specular Color
+        nv::vec3f m_specular;
+
+        // Specular Power
+        uint32_t m_shininess;
+
+        // Translucency
+        float m_alpha;
+
+        // Diffuse Texture Map
+        GLuint m_diffuseTexture;
+
+        // Bump (Normal) Texture Map
+        GLuint m_bumpMapTexture;
+    };
 }
 
-void NvFClose( NvFile* file )
-{
-	NvAssetLoaderFree( file->mData );
-	delete file;
-}
-
-char* NvFGets( char* s, int size, NvFile* stream )
-{
-	char* ptr = s;
-	
-	if( stream->mIndex == stream->mLen || !size )
-		return NULL;
-		
-	while( stream->mIndex < stream->mLen )
-	{
-		if( size == 1 )
-		{
-			break;
-		}
-		
-		char next = stream->mData[stream->mIndex++];
-		*( ptr++ ) = next;
-		size--;
-		
-		if( next == '\r' || next == '\n' )
-		{
-			break;
-		}
-	}
-	
-	// terminator (we always terminate when there is at least one byte
-	// of space in the output buffer)
-	*ptr = '\0';
-	
-	return s;
-}
-
-size_t NvFRead( void* ptr, size_t size, size_t nmemb, NvFile* stream )
-{
-	size_t totalCount = ( stream->mLen - stream->mIndex ) / size;
-	totalCount = ( totalCount > nmemb ) ? nmemb : totalCount;
-	
-	memcpy( ptr, stream->mData + stream->mIndex, size * totalCount );
-	stream->mIndex += int32_t( size * totalCount );
-	
-	return totalCount;
-}
-
+#endif
