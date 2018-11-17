@@ -43,6 +43,7 @@
 #include "BlurShaderGenerator.h"
 #include "CubeData.h"
 #include "HDRImages.h"
+#include "NvInputTransformer.h"
 
 class HDR //: public NvSampleAppGL
 {
@@ -170,4 +171,5 @@ private:
 	bool m_autoExposure;
 	bool m_autoSpin;
 	
+	NvInputTransformer* m_transformer;
 };

@@ -53,6 +53,26 @@
 
 #include "AppExtensions.h"
 
+#ifdef _WIN32
+#include <Windows.h>
+void NVPlatformLog( const char* fmt, ... )
+{
+	const int length = 1024;
+	char buffer[length];
+	va_list ap;
+	
+	va_start( ap, fmt );
+	vsnprintf_s( buffer, length - 1, fmt, ap );
+	OutputDebugStringA( buffer );
+	OutputDebugStringA( "\n" );
+	
+	//if( sUseStderr )
+	//	fprintf( stderr, "%s\n", buffer );
+
+	va_end( ap );
+}
+#endif
+
 // rendering defs /////////////////////////////////////////////////////////////////////////
 #define Z_NEAR 0.4f
 #define Z_FAR 500.0f
@@ -125,8 +145,9 @@ MTLData material[8] =
 
 HDR::HDR()
 {
-	//m_transformer->setTranslationVec( nv::vec3f( 0.0f, 0.0f, -202.2f ) );
-	//m_transformer->setRotationVec( nv::vec3f( 0.0f, 0.0f, 0.0f ) );
+	m_transformer = new NvInputTransformer;
+	m_transformer->setTranslationVec( nv::vec3f( 0.0f, 0.0f, -202.2f ) );
+	m_transformer->setRotationVec( nv::vec3f( 0.0f, 0.0f, 0.0f ) );
 	
 	// Required in all subclasses to avoid silent link issues
 	//forceLinkHack();
@@ -315,7 +336,7 @@ void HDR::InitRenderTexture( int width, int height )
 		h /= 4;
 	}
 	
-	glBindFramebuffer( GL_FRAMEBUFFER, getMainFBO() );
+	glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 }
 
 void HDR::initBlurCode()
@@ -346,16 +367,17 @@ void HDR::initBlurCode()
 
 bool HDR::initShaders()
 {
-	bool isES = getGLContext()->getConfiguration().apiVer.api == NvGLAPI::GLES;
+	//bool isES = getGLContext()->getConfiguration().apiVer.api == NvGLAPI::GLES;
+	bool isES = false;
 	
-	if( getGLContext()->getConfiguration().apiVer.api == NvGLAPI::GL )
+	//if( getGLContext()->getConfiguration().apiVer.api == NvGLAPI::GL )
 	{
 		NvGLSLProgram::setGlobalShaderHeader( "#version 130\n" );
 	}
-	else
-	{
-		NvGLSLProgram::setGlobalShaderHeader( "#version 300 es\n" );
-	}
+	//else
+	//{
+	//	NvGLSLProgram::setGlobalShaderHeader( "#version 300 es\n" );
+	//}
 	
 	m_shaders[SKYBOX].GenProgram( PROGRAM_PARAMETER( skybox ) );
 	m_shaders[MATTEOBJECT].GenProgram( PROGRAM_PARAMETER( matteObject ) );
@@ -403,22 +425,24 @@ bool HDR::initModels()
 
 void HDR::initRendering( void )
 {
-	NV_APP_BASE_SHARED_INIT();
+	//NV_APP_BASE_SHARED_INIT();
 	
 	printGLString( "Version",    GL_VERSION );
 	printGLString( "Vendor",     GL_VENDOR );
 	printGLString( "Renderer",   GL_RENDERER );
 	printGLString( "Extensions", GL_EXTENSIONS );
 	NvAssetLoaderAddSearchPath( "es3aep-kepler/HDR" );
-	GLint depthBits;
+	
 	int i;
-	glGetIntegerv( GL_DEPTH_BITS, &depthBits );
-	LOGI( "depth bits = %d\n", depthBits );
+	
+	//GLint depthBits;
+	//glGetIntegerv( GL_DEPTH_BITS, &depthBits );
+	//LOGI( "depth bits = %d\n", depthBits );
 	
 	glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
 	
-	InitRenderTexture( getGLContext()->width(), getGLContext()->height() );
-	m_aspectRatio = float( getGLContext()->width() ) / float( getGLContext()->height() );
+	InitRenderTexture( m_width, m_height );
+	m_aspectRatio = float( m_width ) / float( m_height );
 	
 	//load all HDRImages we need
 	for( i = 0; i < 4; i++ )
@@ -507,7 +531,7 @@ void HDR::initUI( void )
 {
 #if 0
 	// TODO replace with IMGUI
-
+	
 	if( mTweakBar )
 	{
 		NvTweakVarBase* var;
@@ -1060,7 +1084,7 @@ void HDR::genGhostImage( float* ghost_modulation1st, float* ghost_modulation2nd 
  */
 void HDR::toneMappingPass()
 {
-	glBindFramebuffer( GL_FRAMEBUFFER, getMainFBO() );
+	glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 	glViewport( 0, 0, m_width, m_height );
 	
 	
@@ -1086,7 +1110,7 @@ void HDR::toneMappingPass()
 
 void HDR::blitBuffer( RenderTexture* src )
 {
-	glBindFramebuffer( GL_FRAMEBUFFER, getMainFBO() );
+	glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 	glViewport( 0, 0, m_width, m_height );
 	glClearColor( 1.0f, 0.0f, 0.0f, 1.0f );
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
@@ -1102,13 +1126,13 @@ void HDR::blitBuffer( RenderTexture* src )
 
 void HDR::draw( void )
 {
-	//glBindFramebuffer(GL_FRAMEBUFFER, getMainFBO());
+	//glBindFramebuffer(GL_FRAMEBUFFER, 0);
 //   glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
 //   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	m_transformer->setRotationVel( nv::vec3f( 0.0f, m_autoSpin ? ( NV_PI * 0.05f ) : 0.0f, 0.0f ) );
 	
-	update();
+	// FIXME update();
 	updateDynamics();
 	render();
 	
@@ -1183,7 +1207,7 @@ void HDR::calculateLuminance()
 	glBindImageTexture( 1, m_lum[0], 0, GL_FALSE, 0, GL_READ_ONLY, GL_RGBA16F );
 	glBindImageTexture( 2, m_lum[1], 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA16F );
 	
-	float time = getFrameDeltaTime();
+	float time = 1.0F / 60.0F; // FIXME getFrameDeltaTime();
 	glUniform1f( m_shaders[CALCADAPTEDLUM].auiLocation[0], time );
 	glDispatchCompute( 1, 1, 1 );
 	glMemoryBarrier( GL_SHADER_IMAGE_ACCESS_BARRIER_BIT );
@@ -1199,3 +1223,10 @@ void HDR::updateDynamics()
 //{
 //	return new HDR();
 //}
+
+
+int WINAPI WinMain( HINSTANCE instance, HINSTANCE prevInstance, LPSTR commandLine, int cmdShow )
+{
+	LOGI( "TODO" );
+	return 0;
+}

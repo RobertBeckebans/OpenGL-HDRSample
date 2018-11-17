@@ -128,11 +128,15 @@ project "HDROpenGLSample"
 	files
 	{
 		"../code/**.h", "../code/**.cpp",
-		"../externals/glad.c",
+		"../externals/glad/glad.c",
 		
 		"../externals/NV/**.h",
+		"../externals/NV/**.cpp",
 		"../externals/NvGLUtils/**.h",
-		"../externals/NvGLUtils/NvGLSLProgram.cpp",
+		"../externals/NvGLUtils/**.cpp",
+		
+		"../externals/NvImage/**.h",
+		"../externals/NvImage/**.cpp",
 	}
 	includedirs
 	{
