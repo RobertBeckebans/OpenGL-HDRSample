@@ -1227,6 +1227,6 @@ void HDR::updateDynamics()
 
 int WINAPI WinMain( HINSTANCE instance, HINSTANCE prevInstance, LPSTR commandLine, int cmdShow )
 {
-	LOGI( "TODO" );
+	LOGI( "TODO init SDL, create main loop" );
 	return 0;
 }
