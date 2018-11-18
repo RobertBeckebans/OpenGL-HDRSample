@@ -153,6 +153,7 @@ MTLData material[8] =
 HDR::HDR()
 {
 	m_transformer = new NvInputTransformer;
+	m_transformer->setScreenSize( m_width, m_height );
 	m_transformer->setTranslationVec( nv::vec3f( 0.0f, 0.0f, -202.2f ) );
 	m_transformer->setRotationVec( nv::vec3f( 0.0f, 0.0f, 0.0f ) );
 	
@@ -1154,6 +1155,7 @@ void HDR::draw()
 	glBindVertexArray( m_VAO );
 	
 	m_transformer->setRotationVel( nv::vec3f( 0.0f, m_autoSpin ? ( NV_PI * 0.05f ) : 0.0f, 0.0f ) );
+	m_transformer->update( 1.0F / 60.0F );
 	
 	// FIXME update();
 	updateDynamics();

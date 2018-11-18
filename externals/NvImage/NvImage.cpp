@@ -55,7 +55,7 @@ NvImage::FormatInfo NvImage::formatTable[MAX_LOADERS] = {
 
 bool NvImage::vertFlip = true;
 bool NvImage::m_expandDXT = true;
-bool NvImage::m_supportsBGR = true;
+bool NvImage::m_supportsBGR = false;
 
 //
 //
