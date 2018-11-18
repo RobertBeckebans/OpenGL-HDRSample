@@ -547,68 +547,62 @@ void HDR::initRendering()
 	modulateColor();
 }
 
-void HDR::initUI( void )
+void HDR::prepareImGui()
 {
-#if 0
-	// TODO replace with IMGUI
-	
-	if( mTweakBar )
+	// 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
+	if( m_showDemoWindow )
 	{
-		NvTweakVarBase* var;
-		
-		var = mTweakBar->addValue( "Auto Spin", m_autoSpin );
-		var = mTweakBar->addValue( "Draw Background", m_drawBackground );
-		var = mTweakBar->addValue( "Adaptive Exposure", m_autoExposure );
-		var = mTweakBar->addValue( "Exposure", m_expAdjust, 1.0f, 5.0f );
-		
-		mTweakBar->addPadding();
-		mTweakBar->addPadding();
-		NvTweakEnum<uint32_t> sceneIndex[] =
-		{
-			{ "Nature", 0 },
-			{ "Grace", 1 },
-			{ "Altar", 2 },
-			{ "Uffizi", 3 },
-		};
-		mTweakBar->addMenu( "Select Scene:", m_sceneIndex, sceneIndex, TWEAKENUM_ARRAYSIZE( sceneIndex ), 0x22 );
-		
-		mTweakBar->addPadding();
-		NvTweakEnum<uint32_t> materialIndex[] =
-		{
-			{ "Matte", 0 },
-			{ "Alum", 1 },
-			{ "Silver", 2 },
-			{ "Golden", 3 },
-			{ "Metalic", 4 },
-			{ "Diamond", 5 },
-			{ "Emerald", 6 },
-			{ "Ruby", 7 },
-		};
-		mTweakBar->addMenu( "Select Material:", m_materialIndex, materialIndex, TWEAKENUM_ARRAYSIZE( materialIndex ), 0x33 );
-		
-		mTweakBar->addPadding();
-		mTweakBar->addPadding();
-		NvTweakEnum<uint32_t> objectIndex[] =
-		{
-			{ "Venus", 0 },
-			{ "Teapot", 1 },
-			{ "Knot", 2 },
-		};
-		
-		mTweakBar->addEnum( "Select Object:", m_objectIndex, objectIndex, TWEAKENUM_ARRAYSIZE( objectIndex ), 0x55 );
-		
-		mTweakBar->addPadding();
-		NvTweakEnum<uint32_t> glareType[] =
-		{
-			{ "Camera", CAMERA_GLARE },
-			{ "Filmic", FILMIC_GLARE },
-		};
-		
-		mTweakBar->addEnum( "Glare Type:", m_glareType, glareType, TWEAKENUM_ARRAYSIZE( glareType ), 0x44 );
-		
-		mTweakBar->syncValues();
+		ImGui::ShowDemoWindow( &m_showDemoWindow );
 	}
-#endif
+	
+	// 2. Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
+	{
+		static float f = 0.0f;
+		static int counter = 0;
+		
+		ImGui::Begin( "HDR Sample" );                        // Create a window called "Hello, world!" and append into it.
+		
+		//ImGui::Text( "This is some useful text." );             // Display some text (you can use a format strings too)
+		ImGui::Checkbox( "Demo Window", &m_showDemoWindow );    // Edit bools storing our window open/close state
+		
+		ImGui::Checkbox( "Auto Spin", &m_autoSpin );
+		ImGui::Checkbox( "Draw Background", &m_drawBackground );
+		
+		ImGui::Checkbox( "Adaptive Exposure", &m_autoExposure );
+		
+		ImGui::SliderFloat( "Exposure", &m_expAdjust, 1.0f, 5.0f );
+		
+		ImGui::ColorEdit3( "Clear Color", ( float* )&m_clearColor );
+		
+		//if( ImGui::Button( "Button" ) )                         // Buttons return true when clicked (most widgets return true when edited/activated)
+		//	counter++;
+		//ImGui::SameLine();
+		//ImGui::Text( "counter = %d", counter );
+		
+		static int itemCurrent = m_sceneIndex;
+		ImGui::Combo( "Scene", &itemCurrent, "Nature\0Grace\0Altar\0Uffizi\0\0" );
+		m_sceneIndex = itemCurrent;
+		
+		static int itemCurrent2 = m_materialIndex;
+		ImGui::Combo( "Material", &itemCurrent2, "Matte\0Alum\0Silver\0Golden\0Metalic\0Diamond\0Emerald\0Ruby\0\0" );
+		m_materialIndex = itemCurrent2;
+		
+		static int itemCurrent3 = m_objectIndex;
+		ImGui::Combo( "Object", &itemCurrent3, "Venus\0Teapot\0Knot\0\0" );
+		m_objectIndex = itemCurrent3;
+		
+		static int itemCurrent4 = m_objectIndex;
+		ImGui::Combo( "Glare Type", &itemCurrent4, "Camera\0Filmic\0\0" );
+		
+		m_glareType = CAMERA_GLARE;
+		if( itemCurrent4 == 1 )
+		{
+			m_glareType = FILMIC_GLARE;
+		}
+		
+		ImGui::Text( "Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate );
+		ImGui::End();
+	}
 }
 
 
@@ -1148,7 +1142,7 @@ void HDR::draw()
 {
 #if 1
 	glBindFramebuffer( GL_FRAMEBUFFER, 0 );
-	glClearColor( 1.0f, 0.0f, 0.0f, 1.0f );
+	glClearColor( m_clearColor.x, m_clearColor.y, m_clearColor.z, m_clearColor.w );
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 #endif
 	
@@ -1417,10 +1411,6 @@ int WINAPI WinMain( HINSTANCE instance, HINSTANCE prevInstance, LPSTR commandLin
 	//ImFont* font = io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\ArialUni.ttf", 18.0f, NULL, io.Fonts->GetGlyphRangesJapanese());
 	//IM_ASSERT(font != NULL);
 	
-	bool show_demo_window = false;
-	bool show_another_window = false;
-	ImVec4 clear_color = ImVec4( 0.45f, 0.55f, 0.60f, 1.00f );
-	
 	HDR* hdrDemo = new HDR;
 	hdrDemo->initRendering();
 	
@@ -1458,54 +1448,18 @@ int WINAPI WinMain( HINSTANCE instance, HINSTANCE prevInstance, LPSTR commandLin
 		ImGui_ImplSDL2_NewFrame( window );
 		ImGui::NewFrame();
 		
-		// 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
-		if( show_demo_window )
-		{
-			ImGui::ShowDemoWindow( &show_demo_window );
-		}
+		hdrDemo->prepareImGui();
 		
-		// 2. Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
-		{
-			static float f = 0.0f;
-			static int counter = 0;
-			
-			ImGui::Begin( "Hello, world!" );                        // Create a window called "Hello, world!" and append into it.
-			
-			ImGui::Text( "This is some useful text." );             // Display some text (you can use a format strings too)
-			ImGui::Checkbox( "Demo Window", &show_demo_window );    // Edit bools storing our window open/close state
-			ImGui::Checkbox( "Another Window", &show_another_window );
-			
-			ImGui::SliderFloat( "float", &f, 0.0f, 1.0f );          // Edit 1 float using a slider from 0.0f to 1.0f
-			ImGui::ColorEdit3( "clear color", ( float* )&clear_color ); // Edit 3 floats representing a color
-			
-			if( ImGui::Button( "Button" ) )                         // Buttons return true when clicked (most widgets return true when edited/activated)
-				counter++;
-			ImGui::SameLine();
-			ImGui::Text( "counter = %d", counter );
-			
-			ImGui::Text( "Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate );
-			ImGui::End();
-		}
-		
-		// 3. Show another simple window.
-		if( show_another_window )
-		{
-			ImGui::Begin( "Another Window", &show_another_window ); // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
-			ImGui::Text( "Hello from another window!" );
-			if( ImGui::Button( "Close Me" ) )
-				show_another_window = false;
-			ImGui::End();
-		}
-		
-		// Rendering
 		ImGui::Render();
+		
+		// actually draw to OpenGL
 		SDL_GL_MakeCurrent( window, glContext );
 		
 		hdrDemo->draw();
 		
-		glViewport( 0, 0, ( int )io.DisplaySize.x, ( int )io.DisplaySize.y );
-		//glClearColor( clear_color.x, clear_color.y, clear_color.z, clear_color.w );
-		//glClear( GL_COLOR_BUFFER_BIT );
+		//glViewport( 0, 0, ( int )io.DisplaySize.x, ( int )io.DisplaySize.y );
+		
+		// draw ImGui on top
 		ImGui_ImplOpenGL3_RenderDrawData( ImGui::GetDrawData() );
 		SDL_GL_SwapWindow( window );
 	}

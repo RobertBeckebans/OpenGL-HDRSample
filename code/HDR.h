@@ -31,10 +31,8 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 //----------------------------------------------------------------------------------
-//#include "NvAppBase/gl/NvSampleAppGL.h"
+#include <imgui.h>
 
-//#include "KHR/khrplatform.h"
-//#include "NvGamepad/NvGamepad.h"
 #include "NvMath.h"
 #include "RenderTexture.h"
 #include "VertexBufferObject.h"
@@ -52,7 +50,7 @@ public:
 	~HDR();
 	
 	void initRendering();
-	void initUI();
+	void prepareImGui();
 	void draw();
 	void reshape( int32_t width, int32_t height );
 	void updateDynamics();
@@ -174,4 +172,7 @@ private:
 	bool m_autoSpin;
 	
 	NvInputTransformer* m_transformer;
+	
+	bool m_showDemoWindow = false;
+	ImVec4 m_clearColor = ImVec4( 0.45f, 0.55f, 0.60f, 1.00f );
 };
