@@ -137,6 +137,9 @@ project "HDROpenGLSample"
 		
 		"../externals/NvImage/**.h",
 		"../externals/NvImage/**.cpp",
+		
+		"../externals/imgui/*.h",
+		"../externals/imgui/*.cpp",
 	}
 	includedirs
 	{
@@ -146,6 +149,12 @@ project "HDROpenGLSample"
 		
 		"../externals/NV",
 		"../externals/NvGLUtils",
+		
+		"../externals/imgui",
+	}
+	defines
+	{
+		"IMGUI_IMPL_OPENGL_LOADER_GLAD",
 	}
 		
 	configuration { "vs*", "x64" }
@@ -155,6 +164,7 @@ project "HDROpenGLSample"
 		}
 		links
 		{
+			"SDL2",
 			"advapi32",
 			"gdi32",
 			"kernel32",

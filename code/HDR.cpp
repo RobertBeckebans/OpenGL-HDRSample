@@ -31,6 +31,13 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 //----------------------------------------------------------------------------------
+
+#include "imgui.h"
+#include "imgui_impl_sdl.h"
+#include "imgui_impl_opengl3.h"
+#include <stdio.h>
+#include <SDL.h>
+
 #include "HDR.h"
 //#include "NvAppBase/NvFramerateCounter.h"
 //#include "NvAppBase/NvInputTransformer.h"
@@ -68,7 +75,7 @@ void NVPlatformLog( const char* fmt, ... )
 	
 	//if( sUseStderr )
 	//	fprintf( stderr, "%s\n", buffer );
-
+	
 	va_end( ap );
 }
 #endif
@@ -84,8 +91,8 @@ const char* s_hdr_tex_rough[4] = {"textures/rnl_cross_rough_mmp_s.hdr", "texture
 const char* s_hdr_tex_irrad[4] = {"textures/rnl_cross_irrad_mmp_s.hdr", "textures/grace_cross_irrad_mmp_s.hdr", "textures/altar_cross_irrad_mmp_s.hdr", "textures/uffizi_cross_irrad_mmp_s.hdr"};
 const char* maskTex = {"textures/mask.dds"};
 
-int			m_width = 1280;
-int			m_height = 720;
+int			m_width = 1920;
+int			m_height = 1080;
 
 HDRImage*	image[4] = {0, 0, 0, 0};
 GLuint		hdr_tex[4];
@@ -1140,8 +1147,6 @@ void HDR::draw( void )
 
 void HDR::render()
 {
-	int i;
-	
 	DrawScene();
 	
 	//Downsize scene buffer for post processing.
@@ -1159,7 +1164,7 @@ void HDR::render()
 	
 	//Gaussian blur on pyramid buffers.
 	blur( compose_buffer[LEVEL_0], blur_bufferA[LEVEL_0], blur_bufferB[LEVEL_0], BLURH4 );
-	for( i = LEVEL_1; i < LEVEL_TOTAL; i++ )
+	for( int i = LEVEL_1; i < LEVEL_TOTAL; i++ )
 	{
 		downsample( compose_buffer[i - 1], compose_buffer[i] );
 		blur( compose_buffer[i], blur_bufferA[i], blur_bufferB[i], ( BLURH4 + i * 2 ) > BLURH12 ? BLURH12 : ( BLURH4 + i * 2 ) );
@@ -1219,14 +1224,271 @@ void HDR::updateDynamics()
 	
 }
 
-//NvAppBase* NvAppFactory()
-//{
-//	return new HDR();
-//}
 
+
+static void APIENTRY
+DebugCallback( GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length,
+			   const GLchar* message, const void* userParam )
+{
+	const char* sourceStr = "Source: Unknown";
+	const char* typeStr = "Type: Unknown";
+	const char* severityStr = "Severity: Unknown";
+	
+	switch( severity )
+	{
+		case 0x826B: // GL_DEBUG_SEVERITY_NOTIFICATION_ARB - I don't care
+			return;
+			
+		case GL_DEBUG_SEVERITY_HIGH:
+			severityStr = "Severity: High";
+			break;
+		case GL_DEBUG_SEVERITY_MEDIUM:
+			severityStr = "Severity: Medium";
+			break;
+		case GL_DEBUG_SEVERITY_LOW:
+			severityStr = "Severity: Low";
+			break;
+	}
+	
+	switch( source )
+	{
+#define SRCCASE(X)  case GL_DEBUG_SOURCE_ ## X: sourceStr = "Source: " #X; break;
+			SRCCASE( API );
+			SRCCASE( WINDOW_SYSTEM );
+			SRCCASE( SHADER_COMPILER );
+			SRCCASE( THIRD_PARTY );
+			SRCCASE( APPLICATION );
+			SRCCASE( OTHER );
+#undef SRCCASE
+	}
+	
+	switch( type )
+	{
+#define TYPECASE(X)  case GL_DEBUG_TYPE_ ## X: typeStr = "Type: " #X; break;
+			TYPECASE( ERROR );
+			TYPECASE( DEPRECATED_BEHAVIOR );
+			TYPECASE( UNDEFINED_BEHAVIOR );
+			TYPECASE( PORTABILITY );
+			TYPECASE( PERFORMANCE );
+			TYPECASE( OTHER );
+#undef TYPECASE
+	}
+	
+	LOGI( "GLDBG %s %s %s: %s\n", sourceStr, typeStr, severityStr, message );
+}
+
+static SDL_Window* window = NULL;
+static SDL_GLContext glContext = NULL;
+
+static void cleanupSDL()
+{
+	ImGui_ImplOpenGL3_Shutdown();
+	ImGui_ImplSDL2_Shutdown();
+	ImGui::DestroyContext();
+	
+	if( glContext != NULL )
+		SDL_GL_DeleteContext( glContext );
+		
+	if( window != NULL )
+		SDL_DestroyWindow( window );
+		
+	SDL_Quit();
+}
 
 int WINAPI WinMain( HINSTANCE instance, HINSTANCE prevInstance, LPSTR commandLine, int cmdShow )
 {
-	LOGI( "TODO init SDL, create main loop" );
+	if( SDL_Init( SDL_INIT_VIDEO ) < 0 )
+	{
+		LOGE( "SDL_Init() failed: %s\n", SDL_GetError() );
+		return 1;
+	}
+	
+	if( SDL_GL_LoadLibrary( NULL ) == -1 )
+	{
+		LOGE( "SDL_GL_LoadLibrary(NULL) failed: %s\n", SDL_GetError() );
+		cleanupSDL();
+		return 1;
+	}
+	
+	SDL_GL_SetAttribute( SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE );
+	SDL_GL_SetAttribute( SDL_GL_CONTEXT_MAJOR_VERSION, 4 );
+	SDL_GL_SetAttribute( SDL_GL_CONTEXT_MINOR_VERSION, 3 );
+	
+	bool useDebugContext = false;
+	
+	if( useDebugContext )
+	{
+		SDL_GL_SetAttribute( SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_DEBUG_FLAG );
+	}
+	
+	SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
+	SDL_GL_SetAttribute( SDL_GL_DEPTH_SIZE, 24 );
+	SDL_GL_SetAttribute( SDL_GL_STENCIL_SIZE, 8 );
+	
+	window = SDL_CreateWindow( "HDR OpenGL 4 Sample", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
+							   m_width, m_height, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN );
+							   
+	if( window == NULL )
+	{
+		LOGE( "SDL_CreateWindow() failed: %s\n", SDL_GetError() );
+		cleanupSDL();
+		return 1;
+	}
+	
+	glContext = SDL_GL_CreateContext( window );
+	if( glContext == NULL )
+	{
+		LOGE( "SDL_GL_CreateContext() failed: %s\n", SDL_GetError() );
+		cleanupSDL();
+		return 1;
+	}
+	
+	// enable vsync
+	SDL_GL_SetSwapInterval( 1 );
+	
+	// init glad OpenGL loader
+	if( !gladLoadGLLoader( SDL_GL_GetProcAddress ) )
+	{
+		LOGE( "ERROR: loading OpenGL function pointers failed!\n" );
+		cleanupSDL();
+		return 1;
+	}
+	else if( GLVersion.major < 4 || ( GLVersion.major == 4 && GLVersion.minor < 3 ) )
+	{
+		LOGE( "ERROR: glad only got GL version %d.%d!\n", GLVersion.major, GLVersion.minor );
+		
+		cleanupSDL();
+		return 1;
+	}
+	
+	if( useDebugContext )
+	{
+		LOGI( "Installing OpenGL Debug Context Callback\n" );
+		
+		glDebugMessageCallback( DebugCallback, NULL );
+		glEnable( GL_DEBUG_OUTPUT_SYNCHRONOUS );
+	}
+	
+	// Setup Dear ImGui binding
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO();
+	( void )io;
+	//io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;  // Enable Keyboard Controls
+	
+	// GL 3.0 + GLSL 130
+	const char* glsl_version = "#version 130";
+	
+	ImGui_ImplSDL2_InitForOpenGL( window, glContext );
+	ImGui_ImplOpenGL3_Init( glsl_version );
+	
+	// Setup style
+	ImGui::StyleColorsDark();
+	//ImGui::StyleColorsClassic();
+	
+	// Load Fonts
+	// - If no fonts are loaded, dear imgui will use the default font. You can also load multiple fonts and use ImGui::PushFont()/PopFont() to select them.
+	// - AddFontFromFileTTF() will return the ImFont* so you can store it if you need to select the font among multiple.
+	// - If the file cannot be loaded, the function will return NULL. Please handle those errors in your application (e.g. use an assertion, or display an error and quit).
+	// - The fonts will be rasterized at a given size (w/ oversampling) and stored into a texture when calling ImFontAtlas::Build()/GetTexDataAsXXXX(), which ImGui_ImplXXXX_NewFrame below will call.
+	// - Read 'misc/fonts/README.txt' for more instructions and details.
+	// - Remember that in C/C++ if you want to include a backslash \ in a string literal you need to write a double backslash \\ !
+	//io.Fonts->AddFontDefault();
+	//io.Fonts->AddFontFromFileTTF("../../misc/fonts/Roboto-Medium.ttf", 16.0f);
+	//io.Fonts->AddFontFromFileTTF("../../misc/fonts/Cousine-Regular.ttf", 15.0f);
+	//io.Fonts->AddFontFromFileTTF("../../misc/fonts/DroidSans.ttf", 16.0f);
+	//io.Fonts->AddFontFromFileTTF("../../misc/fonts/ProggyTiny.ttf", 10.0f);
+	//ImFont* font = io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\ArialUni.ttf", 18.0f, NULL, io.Fonts->GetGlyphRangesJapanese());
+	//IM_ASSERT(font != NULL);
+	
+	bool show_demo_window = true;
+	bool show_another_window = false;
+	ImVec4 clear_color = ImVec4( 0.45f, 0.55f, 0.60f, 1.00f );
+	
+	// Main loop
+	bool done = false;
+	while( !done )
+	{
+		// Poll and handle events (inputs, window resize, etc.)
+		// You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if dear imgui wants to use your inputs.
+		// - When io.WantCaptureMouse is true, do not dispatch mouse input data to your main application.
+		// - When io.WantCaptureKeyboard is true, do not dispatch keyboard input data to your main application.
+		// Generally you may always pass all inputs to dear imgui, and hide them from your application based on those two flags.
+		SDL_Event event;
+		while( SDL_PollEvent( &event ) )
+		{
+			ImGui_ImplSDL2_ProcessEvent( &event );
+			if( event.type == SDL_QUIT )
+			{
+				done = true;
+			}
+			
+			if( event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE && event.window.windowID == SDL_GetWindowID( window ) )
+			{
+				done = true;
+			}
+			
+			if( event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE )
+			{
+				done = true;
+			}
+		}
+		
+		// Start the Dear ImGui frame
+		ImGui_ImplOpenGL3_NewFrame();
+		ImGui_ImplSDL2_NewFrame( window );
+		ImGui::NewFrame();
+		
+		// 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
+		if( show_demo_window )
+		{
+			ImGui::ShowDemoWindow( &show_demo_window );
+		}
+		
+		// 2. Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
+		{
+			static float f = 0.0f;
+			static int counter = 0;
+			
+			ImGui::Begin( "Hello, world!" );                        // Create a window called "Hello, world!" and append into it.
+			
+			ImGui::Text( "This is some useful text." );             // Display some text (you can use a format strings too)
+			ImGui::Checkbox( "Demo Window", &show_demo_window );    // Edit bools storing our window open/close state
+			ImGui::Checkbox( "Another Window", &show_another_window );
+			
+			ImGui::SliderFloat( "float", &f, 0.0f, 1.0f );          // Edit 1 float using a slider from 0.0f to 1.0f
+			ImGui::ColorEdit3( "clear color", ( float* )&clear_color ); // Edit 3 floats representing a color
+			
+			if( ImGui::Button( "Button" ) )                         // Buttons return true when clicked (most widgets return true when edited/activated)
+				counter++;
+			ImGui::SameLine();
+			ImGui::Text( "counter = %d", counter );
+			
+			ImGui::Text( "Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate );
+			ImGui::End();
+		}
+		
+		// 3. Show another simple window.
+		if( show_another_window )
+		{
+			ImGui::Begin( "Another Window", &show_another_window ); // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
+			ImGui::Text( "Hello from another window!" );
+			if( ImGui::Button( "Close Me" ) )
+				show_another_window = false;
+			ImGui::End();
+		}
+		
+		// Rendering
+		ImGui::Render();
+		SDL_GL_MakeCurrent( window, glContext );
+		glViewport( 0, 0, ( int )io.DisplaySize.x, ( int )io.DisplaySize.y );
+		glClearColor( clear_color.x, clear_color.y, clear_color.z, clear_color.w );
+		glClear( GL_COLOR_BUFFER_BIT );
+		ImGui_ImplOpenGL3_RenderDrawData( ImGui::GetDrawData() );
+		SDL_GL_SwapWindow( window );
+	}
+	
+	cleanupSDL();
+	
 	return 0;
 }
