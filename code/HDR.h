@@ -51,9 +51,9 @@ public:
 	HDR();
 	~HDR();
 	
-	void initRendering( void );
-	void initUI( void );
-	void draw( void );
+	void initRendering();
+	void initUI();
+	void draw();
 	void reshape( int32_t width, int32_t height );
 	void updateDynamics();
 	// void configurationCallback(NvGLConfiguration& config);
@@ -109,6 +109,7 @@ private:
 	void DrawScene();
 	void DrawObject();
 	void DrawSkyBox();
+	void DrawAxisAlignedQuad( float afLowerLeftX, float afLowerLeftY, float afUpperRightX, float afUpperRightY );
 	
 	void toneMappingPass();
 	void downsample( RenderTexture* src, RenderTexture* dest );
@@ -143,6 +144,7 @@ private:
 	GLuint m_lumCurrent;
 	GLuint m_lum[2];
 	GLuint m_lensMask;
+	GLuint m_VAO;
 	
 	RenderTexture*	scene_buffer;
 	RenderTexture*	compose_buffer[LEVEL_TOTAL];

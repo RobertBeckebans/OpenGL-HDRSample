@@ -177,8 +177,13 @@ HDR::HDR()
 	
 }
 
-void DrawAxisAlignedQuad( float afLowerLeftX, float afLowerLeftY, float afUpperRightX, float afUpperRightY )
+void HDR::DrawAxisAlignedQuad( float afLowerLeftX, float afLowerLeftY, float afUpperRightX, float afUpperRightY )
 {
+	glBindVertexArray( 0 );
+	
+	//glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
+	//glBindBuffer( GL_ARRAY_BUFFER, 0 );
+	
 	glDisable( GL_DEPTH_TEST );
 	
 	glEnableVertexAttribArray( 0 );
@@ -196,6 +201,8 @@ void DrawAxisAlignedQuad( float afLowerLeftX, float afLowerLeftY, float afUpperR
 	
 	glDisableVertexAttribArray( 0 );
 	glDisableVertexAttribArray( 1 );
+	
+	glBindVertexArray( m_VAO );
 }
 
 GLuint createCubemapTexture( HDRImage& img, GLint internalformat, bool filtering = true )
@@ -430,15 +437,20 @@ bool HDR::initModels()
 	return true;
 }
 
-void HDR::initRendering( void )
+void HDR::initRendering()
 {
 	//NV_APP_BASE_SHARED_INIT();
 	
 	printGLString( "Version",    GL_VERSION );
 	printGLString( "Vendor",     GL_VENDOR );
 	printGLString( "Renderer",   GL_RENDERER );
-	printGLString( "Extensions", GL_EXTENSIONS );
+	//printGLString( "Extensions", GL_EXTENSIONS );
 	NvAssetLoaderAddSearchPath( "es3aep-kepler/HDR" );
+	
+	glGenVertexArrays( 1, &m_VAO );
+	glBindVertexArray( m_VAO );
+	
+	GLuint m_lensMask;
 	
 	int i;
 	
@@ -1131,18 +1143,21 @@ void HDR::blitBuffer( RenderTexture* src )
 	src->Release();
 }
 
-void HDR::draw( void )
+void HDR::draw()
 {
-	//glBindFramebuffer(GL_FRAMEBUFFER, 0);
-//   glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
-//   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+#if 1
+	glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+	glClearColor( 1.0f, 0.0f, 0.0f, 1.0f );
+	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+#endif
+	
+	glBindVertexArray( m_VAO );
+	
 	m_transformer->setRotationVel( nv::vec3f( 0.0f, m_autoSpin ? ( NV_PI * 0.05f ) : 0.0f, 0.0f ) );
 	
 	// FIXME update();
 	updateDynamics();
 	render();
-	
 }
 
 void HDR::render()
@@ -1221,7 +1236,6 @@ void HDR::calculateLuminance()
 void HDR::updateDynamics()
 {
 	nv::perspective( projection_matrix, FOV * 0.5f, m_width / ( float )m_height, Z_NEAR, Z_FAR );
-	
 }
 
 
@@ -1274,7 +1288,7 @@ DebugCallback( GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei l
 #undef TYPECASE
 	}
 	
-	LOGI( "GLDBG %s %s %s: %s\n", sourceStr, typeStr, severityStr, message );
+	LOGE( "GLDBG %s %s %s: %s", sourceStr, typeStr, severityStr, message );
 }
 
 static SDL_Window* window = NULL;
@@ -1310,11 +1324,11 @@ int WINAPI WinMain( HINSTANCE instance, HINSTANCE prevInstance, LPSTR commandLin
 		return 1;
 	}
 	
-	SDL_GL_SetAttribute( SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE );
+	SDL_GL_SetAttribute( SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY );
 	SDL_GL_SetAttribute( SDL_GL_CONTEXT_MAJOR_VERSION, 4 );
 	SDL_GL_SetAttribute( SDL_GL_CONTEXT_MINOR_VERSION, 3 );
 	
-	bool useDebugContext = false;
+	bool useDebugContext = true;
 	
 	if( useDebugContext )
 	{
@@ -1401,9 +1415,12 @@ int WINAPI WinMain( HINSTANCE instance, HINSTANCE prevInstance, LPSTR commandLin
 	//ImFont* font = io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\ArialUni.ttf", 18.0f, NULL, io.Fonts->GetGlyphRangesJapanese());
 	//IM_ASSERT(font != NULL);
 	
-	bool show_demo_window = true;
+	bool show_demo_window = false;
 	bool show_another_window = false;
 	ImVec4 clear_color = ImVec4( 0.45f, 0.55f, 0.60f, 1.00f );
+	
+	HDR* hdrDemo = new HDR;
+	hdrDemo->initRendering();
 	
 	// Main loop
 	bool done = false;
@@ -1481,9 +1498,12 @@ int WINAPI WinMain( HINSTANCE instance, HINSTANCE prevInstance, LPSTR commandLin
 		// Rendering
 		ImGui::Render();
 		SDL_GL_MakeCurrent( window, glContext );
+		
+		hdrDemo->draw();
+		
 		glViewport( 0, 0, ( int )io.DisplaySize.x, ( int )io.DisplaySize.y );
-		glClearColor( clear_color.x, clear_color.y, clear_color.z, clear_color.w );
-		glClear( GL_COLOR_BUFFER_BIT );
+		//glClearColor( clear_color.x, clear_color.y, clear_color.z, clear_color.w );
+		//glClear( GL_COLOR_BUFFER_BIT );
 		ImGui_ImplOpenGL3_RenderDrawData( ImGui::GetDrawData() );
 		SDL_GL_SwapWindow( window );
 	}
